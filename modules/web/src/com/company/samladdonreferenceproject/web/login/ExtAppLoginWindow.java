@@ -94,7 +94,7 @@ public class ExtAppLoginWindow extends AppLoginWindow {
             if (e.getValue() != null) {
                 SamlConnection connection = (SamlConnection) e.getValue();
                 VaadinSession.getCurrent().getSession().setAttribute(SamlSessionPrincipal.SAML_CONNECTION_CODE, connection.getCode());
-                Page.getCurrent().setLocation(samlConfig.getSamlLoginUrl());
+                Page.getCurrent().setLocation(getLoginUrl());
             }
             ssoLookupField.setValue(null);
         });
@@ -157,5 +157,10 @@ public class ExtAppLoginWindow extends AppLoginWindow {
                     .setView(View.MINIMAL));
             return items;
         });
+    }
+
+    protected String getLoginUrl() {
+        return (samlConfig.getProxyEnabled() ? samlConfig.getProxyServerUrl() : globalConfig.getWebAppUrl())
+                + samlConfig.getSamlBasePath() + samlConfig.getSamlLoginPath();
     }
 }
