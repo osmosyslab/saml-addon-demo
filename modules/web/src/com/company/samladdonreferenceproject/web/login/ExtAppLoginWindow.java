@@ -136,6 +136,14 @@ public class ExtAppLoginWindow extends AppLoginWindow {
                 });
             }
         }
+        //check the error
+        Object error = VaadinService.getCurrentRequest().getWrappedSession()
+                .getAttribute(SamlSessionPrincipal.SAML_ERROR_ATTRIBUTE);
+        if (error != null) {
+            uiAccessor.accessSynchronously(() -> {
+                showUnhandledExceptionOnLogin((Exception) error);
+            });
+        }
         return false;
     }
 
