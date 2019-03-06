@@ -51,6 +51,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.isNull;
+
 /**
  * @author kuchmin
  */
@@ -93,7 +95,7 @@ public class ExtAppLoginWindow extends AppLoginWindow {
         ssoLookupField.addValueChangeListener(e -> {
             if (e.getValue() != null) {
                 SamlConnection connection = (SamlConnection) e.getValue();
-                VaadinSession.getCurrent().getSession().setAttribute(SamlSessionPrincipal.SAML_CONNECTION_CODE, connection.getCode());
+                VaadinSession.getCurrent().getSession().setAttribute(SamlSessionPrincipal.SAML_CONNECTION_CODE, connection.getSsoPath());
                 Page.getCurrent().setLocation(getLoginUrl());
             }
             ssoLookupField.setValue(null);
@@ -122,6 +124,9 @@ public class ExtAppLoginWindow extends AppLoginWindow {
                 uiAccessor.accessSynchronously(() -> {
                     try {
                         User user = samlService.getUser(samlSession);
+                        if (isNull(user)) {
+                            throw new LoginException("User does not exists");
+                        }
                         ExternalUserCredentials credentials = new ExternalUserCredentials(user.getLogin());
                         doLogin(credentials);
                     } catch (LoginException e) {
@@ -164,7 +169,7 @@ public class ExtAppLoginWindow extends AppLoginWindow {
         }
         return AppContext.withSecurityContext(new SecurityContext(systemSession), () -> {
             List<SamlConnection> items = dataManager.loadList(LoadContext.create(SamlConnection.class)
-                    .setQuery(new LoadContext.Query("select e from samladdon$SamlConnection e where e.active = true order by e.code"))
+                    .setQuery(new LoadContext.Query("select e from samladdon$SamlConnection e where e.active = true order by e.ssoPath"))
                     .setView(View.MINIMAL));
             return items;
         });
