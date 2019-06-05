@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.company.samladdonreferenceproject.web.login;
+package com.haulmont.demo.saml.web.login;
 
 import com.haulmont.addon.saml.entity.SamlConnection;
 import com.haulmont.addon.saml.security.SamlSession;
@@ -26,7 +26,7 @@ import com.haulmont.cuba.core.global.LoadContext;
 import com.haulmont.cuba.core.global.View;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.core.sys.SecurityContext;
-import com.haulmont.cuba.gui.components.Label;
+import com.haulmont.cuba.gui.components.GridLayout;
 import com.haulmont.cuba.gui.components.LookupField;
 import com.haulmont.cuba.gui.executors.BackgroundWorker;
 import com.haulmont.cuba.gui.executors.UIAccessor;
@@ -75,9 +75,9 @@ public class ExtAppLoginWindow extends AppLoginWindow {
     protected WebAuthConfig webAuthConfig;
 
     @Inject
-    protected Label ssoLookupFieldLabel;
+    protected GridLayout loginFormLayout;
     @Inject
-    protected LookupField ssoLookupField;
+    protected LookupField<SamlConnection> ssoLookupField;
 
     protected RequestHandler samlCallbackRequestHandler = this::handleSamlCallBackRequest;
 
@@ -90,8 +90,7 @@ public class ExtAppLoginWindow extends AppLoginWindow {
         uiAccessor = backgroundWorker.getUIAccessor();
 
         ssoLookupField.setOptionsList(getActiveConnections());
-        ssoLookupFieldLabel.setVisible(!CollectionUtils.isEmpty(ssoLookupField.getOptionsList()));
-        ssoLookupField.setVisible(!CollectionUtils.isEmpty(ssoLookupField.getOptionsList()));
+        loginFormLayout.setVisible(!CollectionUtils.isEmpty(ssoLookupField.getOptionsList()));
         ssoLookupField.addValueChangeListener(e -> {
             if (e.getValue() != null) {
                 SamlConnection connection = (SamlConnection) e.getValue();

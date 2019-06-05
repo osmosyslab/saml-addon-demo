@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.company.samladdonreferenceproject.core;
+package com.haulmont.demo.saml.core;
 
 import com.haulmont.addon.saml.core.BaseSamlProcessor;
 import com.haulmont.addon.saml.core.SamlProcessor;
@@ -26,30 +26,29 @@ import org.springframework.stereotype.Component;
  * @author adiatullin
  */
 @Component
-public class SamlIdpSamlProcessor extends BaseSamlProcessor implements SamlProcessor {
-
+public class SsoCircleSamlProcessor extends BaseSamlProcessor implements SamlProcessor {
     @Override
     public String getName() {
-        return "samlidp.io";
+        return "ssocircle.com";
     }
 
     @Override
     protected String getLoginAttributeName(SamlSession samlSession, SamlConnection connection) {
-        return "urn:oid:2.5.4.42";
+        return "UserID";
     }
 
     @Override
     protected String getEmailAddressAttributeName(SamlSession samlSession, SamlConnection connection) {
-        return "urn:oid:0.9.2342.19200300.100.1.3";
+        return "EmailAddress";
     }
 
     @Override
     protected String getFirstNameAttributeName(SamlSession samlSession, SamlConnection connection) {
-        return "urn:oid:2.5.4.4";
+        return "FirstName";
     }
 
     @Override
     protected String getLastNameAttributeName(SamlSession samlSession, SamlConnection connection) {
-        return "urn:oid:1.3.6.1.4.1.5923.1.1.1.6";
+        return "LastName";
     }
 }

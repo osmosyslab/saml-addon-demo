@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<window xmlns="http://schemas.haulmont.com/cuba/window.xsd"
+        class="com.haulmont.demo.saml.web.login.ExtAppLoginWindow"
+        extends="/com/haulmont/cuba/web/app/loginwindow/loginwindow.xml"
+        xmlns:ext="http://schemas.haulmont.com/cuba/window-ext.xsd"
+        messagesPack="com.haulmont.demo.saml.web.login">
+    <dialogMode height="600"
+                width="800"/>
+    <layout>
+        <vbox id="loginWrapper">
+            <vbox id="loginMainBox">
+                <vbox id="loginForm">
+                    <cssLayout id="loginCredentials">
+                        <grid id="loginFormLayout" spacing="true" margin="true;false;false;false" width="100%">
+                            <columns>
+                                <column id="loginFormCaptionColumn"/>
+                                <column id="loginFormFieldColumn" flex="1"/>
+                            </columns>
+                            <rows>
+                                <row id="ssoRow">
+                                    <label id="ssoLookupFieldLabel" value="msg://captions.loginBy"
+                                           align="MIDDLE_CENTER"/>
+                                    <lookupField id="ssoLookupField" nullOptionVisible="true" align="MIDDLE_CENTER" width="100%"/>
+                                </row>
+                            </rows>
+                        </grid>
+                    </cssLayout>
+                </vbox>
+            </vbox>
+        </vbox>
+    </layout>
+</window>

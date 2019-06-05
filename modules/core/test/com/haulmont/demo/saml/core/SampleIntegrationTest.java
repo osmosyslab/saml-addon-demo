@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.company.samladdonreferenceproject.core;
+package com.haulmont.demo.saml.core;
 
-import com.company.samladdonreferenceproject.SamladdonreferenceprojectTestContainer;
+import com.haulmont.demo.saml.SamladdonreferenceprojectTestContainer;
 import com.haulmont.cuba.core.EntityManager;
 import com.haulmont.cuba.core.Persistence;
 import com.haulmont.cuba.core.Transaction;
