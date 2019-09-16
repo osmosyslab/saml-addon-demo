@@ -53,35 +53,37 @@ import java.util.Map;
 
 import static java.util.Objects.isNull;
 
-/**
- * @author kuchmin
- */
 public class ExtAppLoginWindow extends AppLoginWindow {
-
-    private static final Logger log = LoggerFactory.getLogger(ExtAppLoginWindow.class);
 
     @Inject
     protected SamlService samlService;
+
     @Inject
     protected TrustedClientService trustedClientService;
+
     @Inject
     protected DataManager dataManager;
+
     @Inject
     protected BackgroundWorker backgroundWorker;
 
     @Inject
     protected SamlConfig samlConfig;
+
     @Inject
     protected WebAuthConfig webAuthConfig;
 
     @Inject
     protected GridLayout loginFormLayout;
+
     @Inject
     protected LookupField<SamlConnection> ssoLookupField;
 
     protected RequestHandler samlCallbackRequestHandler = this::handleSamlCallBackRequest;
 
     protected UIAccessor uiAccessor;
+
+    private static final Logger log = LoggerFactory.getLogger(ExtAppLoginWindow.class);
 
     @Override
     public void init(Map<String, Object> params) {

@@ -1,10 +1,7 @@
 
 buildscript {
-    ext.cubaVersion = '7.0.6'
+    ext.cubaVersion = '7.1.0'
     repositories {
-        
-        mavenLocal()
-
         maven {
             url 'https://repo.cuba-platform.com/content/groups/work'
             credentials {
@@ -60,8 +57,7 @@ limitations under the License.'''
 
 dependencies {
     appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
-    appComponent("com.haulmont.addon.saml:saml-addon-global:0.1-SNAPSHOT")
-
+    appComponent("com.haulmont.addon.saml:saml-addon-global:0.3.0")
 }
 
 def hsql = 'org.hsqldb:hsqldb:2.4.1'
@@ -131,7 +127,7 @@ configure(coreModule) {
         dbName = 'samldemo'
         dbUser = 'sa'
         dbPassword = ''
-    }
+        }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
         dbms = 'hsql'
@@ -139,7 +135,7 @@ configure(coreModule) {
         dbName = 'samldemo'
         dbUser = 'sa'
         dbPassword = ''
-    }
+        }
 }
     
 configure(webModule) {
