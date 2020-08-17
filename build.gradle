@@ -1,6 +1,6 @@
 
 buildscript {
-    ext.cubaVersion = '7.1.0'
+    ext.cubaVersion = '7.2.7'
     repositories {
         maven {
             url 'https://repo.cuba-platform.com/content/groups/work'
@@ -34,9 +34,6 @@ cuba {
         version = '0.1'
         isSnapshot = true
     }
-    tomcat {
-        dir = "$project.rootDir/deploy/tomcat"
-    }
     ide {
         vcs = 'Git'
         copyright = '''Copyright (c) 2008-$today.year Haulmont.
@@ -57,7 +54,7 @@ limitations under the License.'''
 
 dependencies {
     appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
-    appComponent("com.haulmont.addon.saml:saml-addon-global:0.3.0")
+    appComponent('com.haulmont.addon.saml:saml-addon-global:0.4.2')
 }
 
 def hsql = 'org.hsqldb:hsqldb:2.4.1'
@@ -70,6 +67,9 @@ configure([globalModule, coreModule, webModule]) {
 
     dependencies {
         testCompile('junit:junit:4.12')
+        testCompile('org.junit.jupiter:junit-jupiter-api:5.5.2')
+        testCompile('org.junit.jupiter:junit-jupiter-engine:5.5.2')
+        testCompile('org.junit.vintage:junit-vintage-engine:5.5.2')
     }
 
     task sourceJar(type: Jar) {
@@ -79,6 +79,10 @@ configure([globalModule, coreModule, webModule]) {
 
     artifacts {
         archives sourceJar
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }
 
@@ -105,15 +109,8 @@ configure(coreModule) {
 
     }
 
-    task cleanConf(description: 'Cleans up conf directory') {
-        doLast {
-            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}-core")
-            if (dir.isDirectory()) {
-                ant.delete(includeemptydirs: true) {
-                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
-                }
-            }
-        }
+    task cleanConf(description: 'Cleans up conf directory', type: Delete) {
+        delete "$cuba.appHome/${modulePrefix}-core/conf"
     }
 
     task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
@@ -162,7 +159,7 @@ configure(webModule) {
     task deployConf(type: Copy) {
         from file('src')
         include "com/haulmont/saml/**"
-        into "$cuba.tomcat.dir/conf/${modulePrefix}"
+        into "$cuba.appHome/${modulePrefix}/conf"
     }
 
     task clearMessagesCache(type: CubaClearMessagesCache) {
@@ -170,15 +167,8 @@ configure(webModule) {
     }
     deployConf.dependsOn clearMessagesCache
 
-    task cleanConf(description: 'Cleans up conf directory') {
-        doLast {
-            def dir = new File(cuba.tomcat.dir, "/conf/${modulePrefix}")
-            if (dir.isDirectory()) {
-                ant.delete(includeemptydirs: true) {
-                    fileset(dir: dir, includes: '**/*', excludes: 'local.app.properties')
-                }
-            }
-        }
+    task cleanConf(description: 'Cleans up conf directory', type: Delete) {
+        delete "$cuba.appHome/${modulePrefix}/conf"
     }
 
     task deploy(dependsOn: [assemble, cleanConf], type: CubaDeployment) {
@@ -204,9 +194,9 @@ task restart(dependsOn: ['stop', ":${modulePrefix}-core:deploy", ":${modulePrefi
                 socket(server: 'localhost', port: '8787')
             }
         }
-        start.execute()
     }
 }
+restart.finalizedBy start
 
 /*
  * Copyright (c) 2008-2019 Haulmont.
