@@ -234,5 +234,5 @@ task createDockerFile(type: Dockerfile, dependsOn: buildUberJar) {
     destFile = project.file('build/distributions/uberJar/Dockerfile')
     from 'amazoncorretto:11'
     addFile("saml.jar", "/usr/src/saml/saml.jar")
-    defaultCommand("java", "-Dapp.home=/usr/src/saml-addon-demo/home", "-jar", "/usr/src/saml-addon-demo/saml.jar")
+    defaultCommand("java", "-Dapp.home=/usr/src/saml/home", "-jar", "/usr/src/saml/saml.jar")
 }
