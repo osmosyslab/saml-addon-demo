@@ -23,10 +23,10 @@
       maxTotal="20"
       maxIdle="2"
       maxWaitMillis="5000"
-      driverClassName="org.hsqldb.jdbc.JDBCDriver"
-      url="jdbc:hsqldb:hsql://localhost/samldemo"
-      username="sa"
-      password=""/>
+      driverClassName="com.mysql.jdbc.Driver"
+      url="jdbc:mysql://localhost/samldemo?useSSL=false&amp;allowMultiQueries=true&amp;serverTimezone=GMT-3"
+      username="root"
+      password="kawasaki"/>
 
     <!-- Switch off session serialization -->
     <Manager pathname=""/>

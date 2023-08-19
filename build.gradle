@@ -1,6 +1,5 @@
-
 buildscript {
-    ext.cubaVersion = '7.2.7'
+    ext.cubaVersion = '7.2.20'
     repositories {
         maven {
             url 'https://repo.cuba-platform.com/content/groups/work'
@@ -9,20 +8,27 @@ buildscript {
                 password(rootProject.hasProperty('repoPass') ? rootProject['repoPass'] : 'cuba123')
             }
         }
-        
+
     }
     dependencies {
         classpath "com.haulmont.gradle:cuba-plugin:$cubaVersion"
+        classpath 'com.bmuschko:gradle-docker-plugin:3.0.8'
     }
 }
 
-def modulePrefix = 'app'
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+import com.bmuschko.gradle.docker.DockerRegistryCredentials
+
+def modulePrefix = 'saml'
 
 def globalModule = project(":${modulePrefix}-global")
 def coreModule = project(":${modulePrefix}-core")
 def webModule = project(":${modulePrefix}-web")
 
 def servletApi = 'org.apache.tomcat:tomcat-servlet-api:8.0.26'
+
 
 
 apply(plugin: 'idea')
@@ -54,10 +60,10 @@ limitations under the License.'''
 
 dependencies {
     appComponent("com.haulmont.cuba:cuba-global:$cubaVersion")
-    appComponent('com.haulmont.addon.saml:saml-addon-global:0.4.2')
+    appComponent('com.haulmont.addon.saml:saml-addon-global:0.5.2')
 }
 
-def hsql = 'org.hsqldb:hsqldb:2.4.1'
+def mysql = 'mysql:mysql-connector-java:8.0.15'
 
 configure([globalModule, coreModule, webModule]) {
     apply(plugin: 'java')
@@ -91,7 +97,7 @@ configure(globalModule) {
         main { enabled = true }
     }
 
-    
+
 }
 
 configure(coreModule) {
@@ -104,8 +110,8 @@ configure(coreModule) {
     dependencies {
         compile(globalModule)
         compileOnly(servletApi)
-        jdbc(hsql)
-        testRuntime(hsql)
+        jdbc(mysql)
+        testRuntime(mysql)
 
     }
 
@@ -119,22 +125,24 @@ configure(coreModule) {
     }
 
     task createDb(dependsOn: assembleDbScripts, description: 'Creates local database', type: CubaDbCreation) {
-        dbms = 'hsql'
+        dbms = 'mysql'
         host = 'localhost'
         dbName = 'samldemo'
-        dbUser = 'sa'
-        dbPassword = ''
-        }
+        dbUser = 'root'
+        dbPassword = 'kawasaki'
+        connectionParams = '?useSSL=false&allowMultiQueries=true&serverTimezone=GMT-3'
+    }
 
     task updateDb(dependsOn: assembleDbScripts, description: 'Updates local database', type: CubaDbUpdate) {
-        dbms = 'hsql'
+        dbms = 'mysql'
         host = 'localhost'
         dbName = 'samldemo'
-        dbUser = 'sa'
-        dbPassword = ''
-        }
+        dbUser = 'root'
+        dbPassword = 'kawasaki'
+        connectionParams = '?useSSL=false&allowMultiQueries=true&serverTimezone=GMT-3'
+    }
 }
-    
+
 configure(webModule) {
     configurations {
         webcontent
@@ -145,7 +153,7 @@ configure(webModule) {
         compile(globalModule)
 
     }
-    
+
     task webArchive(type: Zip) {
         from file("$buildDir/web")
         from file('web')
@@ -176,9 +184,6 @@ configure(webModule) {
         appJars(modulePrefix + '-global', modulePrefix + '-web')
     }
 }
-
-
-
 
 
 task undeploy(type: Delete, dependsOn: ":${modulePrefix}-web:cleanConf") {
@@ -217,3 +222,17 @@ restart.finalizedBy start
 //task wrapper(type: Wrapper) {
 //    gradleVersion = '4.3.1'
 //}
+task buildUberJar(type: CubaUberJarBuilding) {
+    logbackConfigurationFile = 'etc/uber-jar-logback.xml'
+    singleJar = true
+    webPort=8088
+    appProperties = ['cuba.automaticDatabaseUpdate': true]
+    coreJettyEnvPath = 'modules/core/web/META-INF/jetty-env.xml'
+}
+
+task createDockerFile(type: Dockerfile, dependsOn: buildUberJar) {
+    destFile = project.file('build/distributions/uberJar/Dockerfile')
+    from 'amazon-corretto:11'
+    addFile("saml.jar", "/usr/src/helium/saml.jar")
+    defaultCommand("java", "-Dapp.home=/usr/src/saml-addon-demo/home", "-jar", "/usr/src/saml-addon-demo/saml.jar")
+}
